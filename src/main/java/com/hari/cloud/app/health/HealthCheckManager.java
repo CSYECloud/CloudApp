@@ -17,15 +17,13 @@ public class HealthCheckManager {
     DataSource dataSource;
     @GetMapping("/healthz")
     public ResponseEntity checkHealth() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
         try {
              dataSource.getConnection();
         } catch (PSQLException e) {
-            return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (SQLException e) {
-            return new ResponseEntity(headers, HttpStatus.SERVICE_UNAVAILABLE);
+            return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
         }
-        return new ResponseEntity(headers, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }
