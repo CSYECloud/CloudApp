@@ -25,13 +25,17 @@ jobs:
         java-version: '17'
         distribution: 'oracle'
         cache: maven
-    - name: Setup Postgre SQL    
-      uses: ikalnytskyi/action-setup-postgres@v4
+    - name: Setup MySQL Server
+      uses: mirromutth/mysql-action@v1.1
       with:
-          username: spring
-          password: spring@123
-          database: test
-          port: 5432
+        host port: 3306 # Optional, default value is 3306. The port of host
+        container port: 3306 # Optional, default value is 3306. The port of container
+        mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
+        mysql database: 'cloudapp' # Optional, default value is "test". The specified database which will be create
+        mysql root password: 'root' # Required if "mysql user" is empty, default is empty. The root superuser password
+        mysql user: 'spring' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+        mysql password: 'spring@123' # Required if "mysql user" exists. The password for the "mysql user"
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     - name: Build and test
       run: mvn clean install

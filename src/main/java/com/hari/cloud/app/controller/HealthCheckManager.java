@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.sql.DataSource;
-import org.postgresql.util.PSQLException;
-
 import java.sql.SQLException;
 
 @RestController
@@ -18,8 +16,6 @@ public class HealthCheckManager {
     public ResponseEntity checkHealth() {
         try {
              dataSource.getConnection();
-        } catch (PSQLException e) {
-            return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (SQLException e) {
             return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
         }

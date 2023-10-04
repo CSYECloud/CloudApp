@@ -1,7 +1,6 @@
 package com.hari.cloud.app.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.io.FileNotFoundException;
 import java.net.ConnectException;
 import java.nio.file.NoSuchFileException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +37,9 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new APIError(HttpStatus.INTERNAL_SERVER_ERROR, message, exception));
     }
 
-    @ExceptionHandler({PSQLException.class, ConnectException.class})
+    @ExceptionHandler({SQLException.class, ConnectException.class})
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public ResponseEntity<Object> handlePSQLException(RuntimeException exception, HttpServletRequest request) {
+    public ResponseEntity<Object> handleSQLException(RuntimeException exception, HttpServletRequest request) {
         return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
