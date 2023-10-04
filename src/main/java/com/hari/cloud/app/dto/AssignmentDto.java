@@ -1,0 +1,23 @@
+package com.hari.cloud.app.dto;
+
+import jakarta.validation.constraints.*;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+@Component
+public class AssignmentDto {
+    @NotEmpty(message = "Name cannot be null or empty")
+    public String name;
+    @Min(value = 1, message = "Number of attempts should be greater than or equal to 1")
+    @Max(value = 100, message = "Number of attempts cannot be greater than 100")
+    @NotNull(message = "Number of attempts cannot be null")
+    public Integer num_of_attempts;
+    @Min(value = 1, message = "Points should be greater than or equal to 1")
+    @Max(value = 100, message = "Points cannot be greater than 100")
+    @NotNull(message = "Points cannot be null")
+    public Integer points;
+    @NotNull(message = "Deadline cannot be null")
+    @FutureOrPresent(message = "Deadline should be a present or future date")
+    public Date deadline;
+}
