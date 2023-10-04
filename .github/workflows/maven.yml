@@ -27,16 +27,11 @@ jobs:
         cache: maven
     - name: Setup Postgre SQL    
       uses: ikalnytskyi/action-setup-postgres@v4
-        with:
+      with:
           username: spring
           password: spring@123
           database: test
           port: 5432
-      options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     - name: Build and test
       run: mvn clean install
