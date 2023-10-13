@@ -27,11 +27,8 @@ public class AssignmentService {
     @PersistenceContext
     private EntityManager entityManager;
 
-
     public List<Assignment> getAllAssignments() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(user == null) return null;
-        return user.getAssignments();
+        return (List<Assignment>) assignmentRepository.findAll();
     }
 
     public Assignment createAssignment(AssignmentDto assignmentDto) {

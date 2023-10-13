@@ -1,11 +1,13 @@
 package com.hari.cloud.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
+@JsonIgnoreProperties(ignoreUnknown=false)
 public class AssignmentDto {
     @NotEmpty(message = "Name cannot be null or empty")
     public String name;
