@@ -40,40 +40,47 @@ jobs:
 
     - name: Test with Maven
       run: mvn test
-
-    - name: Setup `packer`
-      uses: hashicorp/setup-packer@main
-      id: setup
-      with:
-        version: ${{ env.PRODUCT_VERSION }}
   
   validate:
     needs: test
     runs-on: ubuntu-latest
     steps:
+
     - uses: actions/checkout@v3
+    - name: Setup `packer`
+      uses: hashicorp/setup-packer@main
+      id: setup
+      with:
+        version: ${{ env.PRODUCT_VERSION }}
+
     - name: Run `packer init`
       id: init
       run: "packer init aws-ec2.pkr.hcl"
+
     - name: Run `packer fmt`
       id: fmt
       run: "packer fmt aws-ec2.pkr.hcl"
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'adopt'
         cache: maven
+
     - name: Package with Maven
       run: mvn package -Dmaven.test.skip
+
     - name: Create test deployment folder
       run: |
         mkdir -p CloudAppRelease && cp ./target/cloud.app-0.0.1-SNAPSHOT.jar CloudAppRelease/cloud.app-0.0.1-SNAPSHOT.jar &&
         cp ./application.properties CloudAppRelease/application.properties && cp ./users.csv CloudAppRelease/users.csv
+
     - name: Create zip of test deployment folder
       uses: montudor/action-zip@v1
       with:
         args: zip -qq -r CloudAppRelease.zip CloudAppRelease
+        
     - name: Run `packer validate`
       id: validate
       run: "packer validate aws-ec2.pkr.hcl"
