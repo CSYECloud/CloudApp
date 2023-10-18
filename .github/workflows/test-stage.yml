@@ -43,28 +43,23 @@ jobs:
     - name: Test with Maven
       run: mvn test
 
-  packer:
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    name: Test Packer
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Setup `packer`
+      uses: hashicorp/setup-packer@main
+      id: setup
+      with:
+        version: ${{ env.PRODUCT_VERSION }}
 
-      - name: Setup `packer`
-        uses: hashicorp/setup-packer@main
-        id: setup
-        with:
-          version: ${{ env.PRODUCT_VERSION }}
+    - name: Run `packer init`
+      id: init
+      run: "packer init ."
 
-      - name: Run `packer init`
-        id: init
-        run: "packer init ."
+    - name: Run `packer fmt`
+      id: fmt
+      run: "packer fmt ."
 
-      - name: Run `packer fmt`
-        id: fmt
-        run: "packer fmt ."
+    - name: Install with Maven
+      run: mvn install
 
-      - name: Run `packer validate`
-        id: validate
-        run: "packer validate ."
+    - name: Run `packer validate`
+      id: validate
+      run: "packer validate ."
