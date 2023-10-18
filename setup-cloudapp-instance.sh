@@ -22,4 +22,4 @@ sudo dpkg -i jdk-21_linux-x64_bin.deb
 
 sudo -u postgres psql
 sudo -i -u postgres psql -d postgres -c "create user hariharansundaram with encrypted password 'gautham123';"
-sudo -i -u postgres psql -d postgres -c "grant all privileges on database postgres to hariharansundaram;"
+sudo -i -u postgres psql -d postgres -c "alter database postgres owner to hariharansundaram;"
