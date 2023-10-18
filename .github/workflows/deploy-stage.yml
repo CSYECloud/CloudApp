@@ -22,6 +22,18 @@ jobs:
           distribution: 'adopt'
           cache: maven
 
+      - name: Setup PostgreSQL Server
+        uses: ikalnytskyi/action-setup-postgres@v4
+        with:
+          username: hariharansundaram
+          password: gautham123
+          database: hariharansundaram
+          port: 5432
+        id: postgres
+
+      - name: Test application
+        run: mvn test
+
       - name: Package application
         run: mvn package -Dmaven.test.skip
 
