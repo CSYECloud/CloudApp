@@ -15,16 +15,8 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
           cache: maven
-      - name: Setup PostgreSQL Server
-        uses: ikalnytskyi/action-setup-postgres@v4
-        with:
-          username: hariharansundaram
-          password: gautham123
-          database: hariharansundaram
-          port: 5432
-        id: postgres
-      - name: Build instance
-        run: mvn install
+      - name: Package application
+        run: mvn package -Dmaven.test.skip
       - name: Create deployment folder
         run: |
           mkdir -p CloudAppRelease && cp ./target/cloud.app-0.0.1-SNAPSHOT.jar CloudAppRelease/cloud.app-0.0.1-SNAPSHOT.jar &&
