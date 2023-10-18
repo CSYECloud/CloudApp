@@ -2,7 +2,7 @@ name: CloudApp Deploy
 
 on:
   push:
-    branches: [ "main", "packer_verify" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -25,6 +25,14 @@ jobs:
         id: postgres
       - name: Build instance
         run: mvn install
+      - name: Create deployment folder
+        run: |
+          mkdir -p CloudAppRelease && cp ./target/cloud.app-0.0.1-SNAPSHOT.jar CloudAppRelease/cloud.app-0.0.1-SNAPSHOT.jar &&
+          cp ./application.properties CloudAppRelease/application.properties && cp ./users.csv CloudAppRelease/users.csv
+      - name: Create zip of deployment folder
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r CloudAppRelease.zip CloudAppRelease
       - name: Run `packer init`
         id: init
         run: "packer init aws-ec2.pkr.hcl"

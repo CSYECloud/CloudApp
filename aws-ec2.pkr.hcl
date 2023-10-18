@@ -17,6 +17,11 @@ variable "subnet_id" {
   default = env("AWS_DEFAULT_SUBNET")
 }
 
+variable "vpc_id" {
+  type    = string
+  default = "vpc-0a648a4bd634e0398"
+}
+
 variable "source_ami" {
   type    = string
   default = "ami-06db4d78cb1d3bbf9" # Debian 12
@@ -27,9 +32,9 @@ variable "ssh_username" {
   default = "admin"
 }
 
-variable "ssh_password" {
-  type    = string
-  default = "packer"
+variable "ami_users" {
+  type    = list(string)
+  default = ["088914901283", "402435988681"]
 }
 
 source "amazon-ebs" "cloudapp-ami" {
@@ -39,23 +44,23 @@ source "amazon-ebs" "cloudapp-ami" {
   ami_regions = [
     "${var.aws_region}",
   ]
+  associate_public_ip_address = true
 
   aws_polling {
     delay_seconds = 30
-    max_attempts  = 50
+    max_attempts  = 80
   }
-  instance_type           = "t2.micro"
-  source_ami              = "${var.source_ami}"
-  ssh_username            = "${var.ssh_username}"
-  subnet_id               = "${var.subnet_id}"
-  temporary_key_pair_type = "ed25519"
-  ssh_interface           = "public_ip"
+  instance_type = "t2.micro"
+  source_ami    = "${var.source_ami}"
+  ssh_username  = "${var.ssh_username}"
+  subnet_id     = "${var.subnet_id}"
+  ami_users     = "${var.ami_users}"
 
 
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/sda1"
-    volume_size           = 8
+    device_name           = "/dev/xvda"
+    volume_size           = 25
     volume_type           = "gp2"
   }
 }
@@ -64,18 +69,13 @@ build {
   sources = ["source.amazon-ebs.cloudapp-ami"]
 
   provisioner "file" {
-    source      = "./target/cloud.app-0.0.1-SNAPSHOT.jar"
-    destination = "/opt/cloud.app-0.0.1-SNAPSHOT.jar"
+    source      = "CloudAppRelease.zip"
+    destination = "~/CloudAppRelease.zip"
   }
 
   provisioner "file" {
-    source      = "./setup-cloudapp-instance.sh"
-    destination = "/opt/setup-cloudapp-instance.sh"
-  }
-
-  provisioner "file" {
-    source      = "./application.properties"
-    destination = "/opt/application.properties"
+    source      = "setup-cloudapp-instance.sh"
+    destination = "~/setup-cloudapp-instance.sh"
   }
 
   provisioner "shell" {
@@ -83,8 +83,6 @@ build {
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1"
     ]
-    scripts = [
-      "setup-cloudapp-instance.sh"
-    ]
+    inline = ["sudo bash ~/setup-cloudapp-instance.sh"]
   }
 }
