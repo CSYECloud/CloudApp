@@ -35,9 +35,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         byte[] decodedBytes = Base64.getDecoder().decode(authHeader);
         String decodedAuthHeader = new String(decodedBytes);
 
-        String email = decodedAuthHeader.split(":")[0];
-        String password = decodedAuthHeader.split(":")[1];
-        System.out.println(email+" "+password+" Email and pwd");
+        String[] email_pass = decodedAuthHeader.split(":");
+        if(email_pass.length < 2 || email_pass[0].isBlank() || email_pass[1].isBlank()) {
+            filterChain.doFilter(request, response);
+            System.out.println("Filtering harry");
+            return;
+        }
+        String email = email_pass[0];
+        String password = email_pass[1];
 
         if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userService.getUserBy(email);
