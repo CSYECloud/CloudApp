@@ -1,7 +1,7 @@
 packer {
   required_plugins {
     amazon = {
-      version = ">= 0.0.2"
+      version = ">= 1.2.6"
       source  = "github.com/hashicorp/amazon"
     }
   }
@@ -12,14 +12,24 @@ variable "aws_region" {
   default = env("AWS_DEFAULT_REGION")
 }
 
+variable "subnet_id" {
+  type    = string
+  default = env("AWS_DEFAULT_SUBNET")
+}
+
 variable "source_ami" {
   type    = string
-  default = "ami-0d3eda47adff3e44b" # Debian 12
+  default = "ami-06db4d78cb1d3bbf9" # Debian 12
 }
 
 variable "ssh_username" {
   type    = string
-  default = "debian"
+  default = "admin"
+}
+
+variable "ssh_password" {
+  type    = string
+  default = "packer"
 }
 
 source "amazon-ebs" "cloudapp-ami" {
@@ -31,12 +41,16 @@ source "amazon-ebs" "cloudapp-ami" {
   ]
 
   aws_polling {
-    delay_seconds = 120
+    delay_seconds = 30
     max_attempts  = 50
   }
-  instance_type = "t2.micro"
-  source_ami    = "${var.source_ami}"
-  ssh_username  = "${var.ssh_username}"
+  instance_type           = "t2.micro"
+  source_ami              = "${var.source_ami}"
+  ssh_username            = "${var.ssh_username}"
+  subnet_id               = "${var.subnet_id}"
+  temporary_key_pair_type = "ed25519"
+  ssh_interface           = "public_ip"
+
 
   launch_block_device_mappings {
     delete_on_termination = true
@@ -50,17 +64,17 @@ build {
   sources = ["source.amazon-ebs.cloudapp-ami"]
 
   provisioner "file" {
-    source = "./target/cloud.app-0.0.1-SNAPSHOT.jar"
+    source      = "./target/cloud.app-0.0.1-SNAPSHOT.jar"
     destination = "/opt/cloud.app-0.0.1-SNAPSHOT.jar"
   }
 
   provisioner "file" {
-    source = "./setup-cloudapp-instance.sh"
+    source      = "./setup-cloudapp-instance.sh"
     destination = "/opt/setup-cloudapp-instance.sh"
   }
 
   provisioner "file" {
-    source = "./application.properties"
+    source      = "./application.properties"
     destination = "/opt/application.properties"
   }
 
