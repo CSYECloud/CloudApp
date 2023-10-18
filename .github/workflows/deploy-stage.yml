@@ -27,7 +27,12 @@ jobs:
         run: mvn install
       - name: Run `packer init`
         id: init
-        run: "packer init ."
+        run: "packer init aws-ec2.pkr.hcl"
       - name: Run `packer build`
         id: build
-        run: "packer build ."
+        run: "packer build aws-ec2.pkr.hcl"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_DEFAULT_SUBNET: ${{ vars.AWS_DEFAULT_SUBNET }}
