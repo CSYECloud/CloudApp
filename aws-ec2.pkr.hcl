@@ -59,9 +59,9 @@ source "amazon-ebs" "cloudapp-ami" {
 
   launch_block_device_mappings {
     delete_on_termination = true
-    device_name           = "/dev/xvda"
-    volume_size           = 25
-    volume_type           = "gp2"
+    device_name  = "/dev/xvda"
+    volume_size = 25
+    volume_type = "gp2"
   }
 }
 
