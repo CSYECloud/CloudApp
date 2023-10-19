@@ -59,7 +59,7 @@ jobs:
 
     - name: Run `packer fmt`
       id: fmt
-      run: "packer fmt aws-ec2.pkr.hcl"
+      run: "packer fmt -check aws-ec2.pkr.hcl"
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3
