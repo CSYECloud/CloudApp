@@ -85,4 +85,4 @@ build {
     ]
     inline = ["sudo bash ~/setup-cloudapp-instance.sh"]
   }
-}
+
