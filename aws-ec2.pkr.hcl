@@ -84,5 +84,5 @@ build {
       "CHECKPOINT_DISABLE=1"
     ]
     inline = ["sudo bash ~/setup-cloudapp-instance.sh"]
-  }
+          }
 }
