@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,9 +16,9 @@ import java.net.ConnectException;
 import java.sql.SQLException;
 
 @SpringBootApplication
+@PropertySource("file:./application-dev.properties")
 public class CloudAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CloudAppApplication.class, args);
 	}
-
 }
