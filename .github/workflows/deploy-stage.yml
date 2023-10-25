@@ -40,8 +40,8 @@ jobs:
       - name: Create deployment folder
         run: |
           mkdir -p CloudAppRelease && cp ./target/cloud.app-0.0.1-SNAPSHOT.jar CloudAppRelease/cloud.app-0.0.1-SNAPSHOT.jar &&
-          cp ./application-prod.properties CloudAppRelease/application-prod.properties && cp ./users.csv CloudAppRelease/users.csv
-          && cp ./start.sh CloudAppRelease/start.sh
+          cp ./application-prod.properties CloudAppRelease/application-prod.properties && cp ./users.csv CloudAppRelease/users.csv &&
+          cp ./start.sh CloudAppRelease/start.sh
 
       - name: Create zip of deployment folder
         uses: montudor/action-zip@v1
