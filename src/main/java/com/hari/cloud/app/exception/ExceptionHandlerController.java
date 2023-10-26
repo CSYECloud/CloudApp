@@ -1,16 +1,23 @@
 package com.hari.cloud.app.exception;
 
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -18,6 +25,7 @@ import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -39,7 +47,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new APIError(HttpStatus.INTERNAL_SERVER_ERROR, message, exception));
     }
 
-    @ExceptionHandler({PSQLException.class, ConnectException.class})
+    @ExceptionHandler({PSQLException.class, ConnectException.class, CannotCreateTransactionException.class})
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ResponseEntity<Object> handlePSQLException(RuntimeException exception, HttpServletRequest request) {
         return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
@@ -60,8 +68,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> buildResponseEntity(APIError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
-
-
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {

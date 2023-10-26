@@ -16,7 +16,6 @@ import java.net.ConnectException;
 import java.sql.SQLException;
 
 @SpringBootApplication
-@PropertySource("file:./application-dev.properties")
 public class CloudAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CloudAppApplication.class, args);

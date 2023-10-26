@@ -1,22 +1,35 @@
 package com.hari.cloud.app.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hari.cloud.app.dao.User;
 import com.hari.cloud.app.service.UserService;
 import com.hari.cloud.app.util.Utility;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.catalina.connector.Response;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.PrintWriter;
+import java.net.http.HttpResponse;
+import java.sql.SQLException;
 import java.util.Base64;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
+@Order(value = 2)
 public class AuthenticationFilter extends OncePerRequestFilter {
     UserService userService;
 
@@ -45,7 +58,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         String password = email_pass[1];
 
         if(email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userService.getUserBy(email);
+            User user;
+            try {
+                user = userService.getUserBy(email);
+            } catch (PSQLException e) {
+                response.setStatus(HttpStatus.SERVICE_UNAVAILABLE.value());
+                response.getWriter().write(convertObjectToJson(response));
+                return;
+            } catch (CannotCreateTransactionException e) {
+                response.setStatus(HttpStatus.SERVICE_UNAVAILABLE.value());
+                response.getWriter().write(convertObjectToJson(response));
+                return;
+            }
+
             // Perform user password validation
             Boolean isAuthenticated = isUserAuthenticated(password, user);
 
@@ -56,6 +81,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    public String convertObjectToJson(Object object) throws JsonProcessingException {
+        if (object == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
     }
 
     private Boolean isUserAuthenticated(String password, User user) {

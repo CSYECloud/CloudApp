@@ -7,6 +7,7 @@ import com.hari.cloud.app.repository.AssignmentRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +32,7 @@ public class AssignmentService {
         return (List<Assignment>) assignmentRepository.findAll();
     }
 
-    public Assignment createAssignment(AssignmentDto assignmentDto) {
+    public Assignment createAssignment(AssignmentDto assignmentDto) throws PSQLException {
         String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         User user = userService.getUserBy(email);
         Assignment assignment = new Assignment();
