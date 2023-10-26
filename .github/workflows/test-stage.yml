@@ -10,7 +10,7 @@ name: CloudApp CI and validation
 
 on:
   pull_request:
-    branches: [ "main", "create_database_rem" ]
+    branches: [ "main" ]
 
 env:
   PRODUCT_VERSION: "1.9.4"

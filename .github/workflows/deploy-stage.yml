@@ -2,7 +2,7 @@ name: CloudApp Deploy
 
 on:
   push:
-    branches: [ "main", "create_database_rem" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
