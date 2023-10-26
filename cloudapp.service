@@ -1,6 +1,5 @@
 [Unit]
 Description=Cloudapp web application service
-After=network.target
 After=cloud-final.service
 
 [Install]
