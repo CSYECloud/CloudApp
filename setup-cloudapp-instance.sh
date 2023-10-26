@@ -18,3 +18,6 @@ sudo dpkg -i jdk-21_linux-x64_bin.deb
 
 sudo groupadd csye6225
 sudo useradd -s /bin/false -g csye6225 -d /opt/CloudAppRelease -m csye6225
+sudo chown csye6225:csye6225 /opt/users.csv
+sudo chown -R csye6225:csye6225 /opt/CloudAppRelease/
+sudo chown csye6225:csye6225  /etc/systemd/system/cloudapp.service

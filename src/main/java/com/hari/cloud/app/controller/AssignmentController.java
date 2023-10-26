@@ -3,6 +3,7 @@ package com.hari.cloud.app.controller;
 import com.hari.cloud.app.dao.Assignment;
 import com.hari.cloud.app.dto.AssignmentDto;
 import com.hari.cloud.app.service.AssignmentService;
+import org.postgresql.util.PSQLException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class AssignmentController {
     }
 
     @PostMapping("/v1/assignments")
-    public ResponseEntity createAssignment(@RequestBody @Valid AssignmentDto assignmentDto) {
+    public ResponseEntity createAssignment(@RequestBody @Valid AssignmentDto assignmentDto) throws PSQLException {
         Assignment assignment = assignmentService.createAssignment(assignmentDto);
         if(assignment == null) {
             return new ResponseEntity(HttpStatus.FORBIDDEN);
