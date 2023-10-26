@@ -21,5 +21,3 @@ sudo useradd -s /bin/false -g csye6225 -d /opt/CloudAppRelease -m csye6225
 sudo chown csye6225:csye6225 /opt/users.csv
 sudo chown -R csye6225:csye6225 /opt/CloudAppRelease/
 sudo chown csye6225:csye6225  /etc/systemd/system/cloudapp.service
-sudo systemctl daemon-reload
-sudo systemctl enable csye6225
