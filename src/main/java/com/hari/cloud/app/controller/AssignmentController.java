@@ -23,15 +23,14 @@ public class AssignmentController {
     @Autowired
     AssignmentService assignmentService;
 
-
-    public static final StatsDClient statsd = new NonBlockingStatsDClient("my.prefix", "localhost", 8125);
+    public static final StatsDClient statsd = new NonBlockingStatsDClient("cloudapp", "localhost", 8125);
 
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     @GetMapping("/v1/assignments")
     public ResponseEntity getAssignments() {
         long startTime = System.currentTimeMillis();
-        statsd.incrementCounter("totalAPICalls");
         log.info("Get assignments API invoked");
+        statsd.incrementCounter("totalAPICalls");
         List<Assignment> assignments = assignmentService.getAllAssignments();
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignments == null) {
@@ -46,9 +45,9 @@ public class AssignmentController {
     @GetMapping("/v1/assignments/{id}")
     public ResponseEntity getAssignment(@PathVariable("id") String id) {
         long startTime = System.currentTimeMillis();
+        log.info("Get assignment with id API invoked");
         statsd.incrementCounter("totalAPICalls");
         Assignment assignment = assignmentService.getAssignmentBy(id);
-        log.info("Get assignment with id API invoked");
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
             log.info("Responded to get assignment with id with forbidden");
@@ -62,9 +61,9 @@ public class AssignmentController {
     @PostMapping("/v1/assignments")
     public ResponseEntity createAssignment(@RequestBody @Valid AssignmentDto assignmentDto) throws PSQLException {
         long startTime = System.currentTimeMillis();
+        log.info("Post assignment with API invoked");
         statsd.incrementCounter("totalAPICalls");
         Assignment assignment = assignmentService.createAssignment(assignmentDto);
-        log.info("Post assignment with API invoked");
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
             log.info("Responded to post assignment with forbidden");
@@ -78,9 +77,9 @@ public class AssignmentController {
     @PutMapping("/v1/assignments/{id}")
     public ResponseEntity updateAssignment(@PathVariable("id") String id, @RequestBody @Valid AssignmentDto assignmentDto) {
         long startTime = System.currentTimeMillis();
+        log.info("Put assignment with API invoked");
         statsd.incrementCounter("totalAPICalls");
         Assignment assignment = assignmentService.updateAssignment(assignmentDto, id);
-        log.info("Put assignment with API invoked");
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
             log.info("Responded to put assignment with not found");
@@ -99,10 +98,10 @@ public class AssignmentController {
         log.info("Delete assignment with API invoked");
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(isSuccessful) {
-            log.info("Responded to delete assignment with success");
+            log.info("Responded to delete assignment with id success");
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         } else {
-            log.info("Responded to delete assignment with not found");
+            log.info("Responded to delete assignment with id not found");
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
