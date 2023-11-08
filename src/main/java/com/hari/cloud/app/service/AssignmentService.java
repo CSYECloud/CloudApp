@@ -7,6 +7,7 @@ import com.hari.cloud.app.repository.AssignmentRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Slf4j
 public class AssignmentService {
     @Autowired
     private AssignmentRepository assignmentRepository;
@@ -33,6 +35,7 @@ public class AssignmentService {
     }
 
     public Assignment createAssignment(AssignmentDto assignmentDto) throws PSQLException {
+        log.info("Initiating creation of an assignment record");
         String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         User user = userService.getUserBy(email);
         Assignment assignment = new Assignment();
@@ -43,7 +46,9 @@ public class AssignmentService {
         assignment.setAssignmentCreated(new Date());
         assignment.setAssignmentUpdated(new Date());
         assignment.setUser(user);
-        return assignmentRepository.save(assignment);
+        Assignment createdAssignment = assignmentRepository.save(assignment);
+        log.info("Successfully created assignment record");
+        return createdAssignment;
     }
 
     public Assignment getAssignmentBy(String id) {
@@ -57,8 +62,10 @@ public class AssignmentService {
     }
 
     public Assignment updateAssignment(AssignmentDto updatedAssignment, String id) {
+        log.info("Initiating update assignment record");
         String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         if(!assignmentRepository.findById(id).isPresent()) {
+            log.info("Assignment with given id not found");
             return null;
         }
         Assignment assignment = assignmentRepository.findById(id).get();
@@ -70,20 +77,28 @@ public class AssignmentService {
         assignment.setPoints(updatedAssignment.points);
         assignment.setDeadline(updatedAssignment.deadline);
         assignment.setAssignmentUpdated(new Date());
-        return assignmentRepository.save(assignment);
+        Assignment updatedAssignmentRecord = assignmentRepository.save(assignment);
+        log.info("Assignment with given id successfully updated");
+        return updatedAssignmentRecord;
     }
 
     @Transactional
     public Boolean deleteAssignmentBy(String id) {
+        log.info("Initiating delete assignment record");
         String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         if(!assignmentRepository.findById(id).isPresent()) {
+            log.info("Delete assignment failed as record not found");
             return false;
         }
         Assignment assignment = assignmentRepository.findById(id).get();
         // Only delete records belonging to the current user
-        if(!assignment.user.getEmail().equals(email)) return false;
+        if(!assignment.user.getEmail().equals(email)) {
+            log.info("Delete assignment failed as record not found for current user");
+            return false;
+        }
         entityManager.remove(assignment);
         entityManager.flush();
+        log.info("Delete assignment successful");
         return true;
     }
 }
