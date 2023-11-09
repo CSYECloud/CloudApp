@@ -1,4 +1,5 @@
 package com.hari.cloud.app.controller;
+import com.timgroup.statsd.NonBlockingStatsDClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,15 @@ import java.sql.SQLException;
 public class HealthCheckManager {
     @Autowired
     DataSource dataSource;
+
+    @Autowired
+    NonBlockingStatsDClient statsd;
+
     @GetMapping("/healthz")
     public ResponseEntity checkHealth() {
         try (Connection connection = dataSource.getConnection()) {
             log.info("Database is healthy");
+            statsd.incrementCounter("healthcheck-invoke-count");
         } catch (PSQLException e) {
             return new ResponseEntity(HttpStatus.SERVICE_UNAVAILABLE);
         } catch (SQLException e) {
