@@ -23,14 +23,15 @@ public class AssignmentController {
     @Autowired
     AssignmentService assignmentService;
 
-    public static final StatsDClient statsd = new NonBlockingStatsDClient("cloudapp", "localhost", 8125);
+    @Autowired
+    NonBlockingStatsDClient statsd;
 
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     @GetMapping("/v1/assignments")
     public ResponseEntity getAssignments() {
         long startTime = System.currentTimeMillis();
         log.info("Get assignments API invoked");
-        statsd.incrementCounter("totalAPICalls");
+        statsd.incrementCounter("getassignments-invoke-count");
         List<Assignment> assignments = assignmentService.getAllAssignments();
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignments == null) {
@@ -46,7 +47,7 @@ public class AssignmentController {
     public ResponseEntity getAssignment(@PathVariable("id") String id) {
         long startTime = System.currentTimeMillis();
         log.info("Get assignment with id API invoked");
-        statsd.incrementCounter("totalAPICalls");
+        statsd.incrementCounter("getAssignmentId-invoke-count");
         Assignment assignment = assignmentService.getAssignmentBy(id);
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
@@ -62,7 +63,7 @@ public class AssignmentController {
     public ResponseEntity createAssignment(@RequestBody @Valid AssignmentDto assignmentDto) throws PSQLException {
         long startTime = System.currentTimeMillis();
         log.info("Post assignment with API invoked");
-        statsd.incrementCounter("totalAPICalls");
+        statsd.incrementCounter("createAssignment-invoke-count");
         Assignment assignment = assignmentService.createAssignment(assignmentDto);
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
@@ -78,7 +79,7 @@ public class AssignmentController {
     public ResponseEntity updateAssignment(@PathVariable("id") String id, @RequestBody @Valid AssignmentDto assignmentDto) {
         long startTime = System.currentTimeMillis();
         log.info("Put assignment with API invoked");
-        statsd.incrementCounter("totalAPICalls");
+        statsd.incrementCounter("updateAssignment-invoke-count");
         Assignment assignment = assignmentService.updateAssignment(assignmentDto, id);
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(assignment == null) {
@@ -93,7 +94,7 @@ public class AssignmentController {
     @DeleteMapping("/v1/assignments/{id}")
     public ResponseEntity deleteAssignment(@PathVariable("id") String id) {
         long startTime = System.currentTimeMillis();
-        statsd.incrementCounter("totalAPICalls");
+        statsd.incrementCounter("deleteAssignment-invoke-count");
         Boolean isSuccessful = assignmentService.deleteAssignmentBy(id);
         log.info("Delete assignment with API invoked");
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
