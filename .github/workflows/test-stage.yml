@@ -41,6 +41,7 @@ jobs:
       run: mvn test
       env:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
   
   validate:
     needs: test
@@ -77,6 +78,7 @@ jobs:
       run: mvn package -Dmaven.test.skip
       env:
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+          AWS_REGION: ${{ vars.AWS_DEFAULT_REGION }}
 
     - name: Create test deployment folder
       run: |
