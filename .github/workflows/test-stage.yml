@@ -54,10 +54,6 @@ jobs:
       id: setup
       with:
         version: ${{ env.PRODUCT_VERSION }}
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: us-east-1
 
     - name: Run `packer init`
       id: init
