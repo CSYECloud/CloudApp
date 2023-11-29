@@ -39,7 +39,7 @@ jobs:
       run: mvn compile
 
     - name: Test with Maven
-      run: mvn test
+      run: export AWS_DEFAULT_REGION=us-east-1 && mvn test
   
   validate:
     needs: test
@@ -69,7 +69,7 @@ jobs:
         cache: maven
 
     - name: Package with Maven
-      run: mvn package -Dmaven.test.skip
+      run: export AWS_DEFAULT_REGION=us-east-1 && mvn package -Dmaven.test.skip
 
     - name: Create test deployment folder
       run: |
