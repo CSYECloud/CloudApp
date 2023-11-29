@@ -20,6 +20,5 @@ public class AssignmentDto {
     @NotNull(message = "Points cannot be null")
     public Integer points;
     @NotNull(message = "Deadline cannot be null")
-    @FutureOrPresent(message = "Deadline should be a present or future date")
     public Date deadline;
 }
