@@ -1,28 +1,20 @@
 package com.hari.cloud.app.exception;
-
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.postgresql.util.PSQLException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.MethodNotAllowedException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import com.amazonaws.services.sns.model.NotFoundException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -58,12 +50,18 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return new ResponseEntity(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, FileNotFoundException.class, NoSuchFileException.class})
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneralException(Exception ex) {
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class, FileNotFoundException.class, NoSuchFileException.class, NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> handleNotFoundException(Exception exception, HttpServletRequest request) {
         String message = "Requested resource could not be located";
         return buildResponseEntity(new APIError(HttpStatus.NOT_FOUND, message, exception));
     }
+
 
     private ResponseEntity<Object> buildResponseEntity(APIError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
