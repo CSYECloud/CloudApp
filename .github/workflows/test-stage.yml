@@ -34,16 +34,13 @@ jobs:
         database: hariharansundaram
         port: 5432
       id: postgres
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: us-east-1
-        
     - name: Build with Maven
       run: mvn compile
 
     - name: Test with Maven
       run: mvn test
+      env:
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
   
   validate:
     needs: test
@@ -78,6 +75,8 @@ jobs:
 
     - name: Package with Maven
       run: mvn package -Dmaven.test.skip
+      env:
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
 
     - name: Create test deployment folder
       run: |
