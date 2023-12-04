@@ -2,6 +2,7 @@ package com.hari.cloud.app.controller;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClient;
@@ -15,6 +16,7 @@ import com.hari.cloud.app.dto.AssignmentDto;
 import com.hari.cloud.app.dto.SubmissionDto;
 import com.hari.cloud.app.service.AssignmentService;
 import com.hari.cloud.app.service.SubmissionService;
+import com.hari.cloud.app.service.UserService;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.postgresql.util.PSQLException;
@@ -43,6 +45,9 @@ public class AssignmentController {
     AssignmentService assignmentService;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     SubmissionService submissionService;
 
     @Autowired
@@ -51,11 +56,7 @@ public class AssignmentController {
     @Autowired
     private Environment env;
 
-    private AmazonSNS snsClient = AmazonSNSClient
-            .builder()
-            .withRegion("us-east-1")
-            .withCredentials(new ProfileCredentialsProvider("dev"))
-            .build();
+    private AmazonSNS snsClient = AmazonSNSClientBuilder.defaultClient();
 
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
     @GetMapping("/v1/assignments")
@@ -136,8 +137,8 @@ public class AssignmentController {
         }
 
         // Insert submission record into database
-        Submission createdSubmission = submissionService.createSubmission(submissionDto, assignmentId);
         log.info("Create submission with assignment id invoked");
+        Submission createdSubmission = submissionService.createSubmission(submissionDto, assignmentId);
         statsd.recordExecutionTime("execution-latency", System.currentTimeMillis()-startTime);
         if(createdSubmission != null) {
             try {
@@ -186,14 +187,19 @@ public class AssignmentController {
         }
     }
 
-    public static void publishToTopic(AmazonSNS snsClient, Submission submission, String topicArn, String attemptNumber) {
+    public void publishToTopic(AmazonSNS snsClient, Submission submission, String topicArn, String attemptNumber) throws PSQLException {
         String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        var user = userService.getUserBy(email);
+        var firstname = user.getFirst_name();
+        var assignmentTitle = assignmentService.getAssignmentBy(submission.assignmentId).name;
         PublishRequest request = new PublishRequest(topicArn, submission.submissionUrl);
+
         request.addMessageAttributesEntry("url", new MessageAttributeValue().withDataType("String").withStringValue(submission.submissionUrl));
         request.addMessageAttributesEntry("attemptNumber", new MessageAttributeValue().withDataType("String").withStringValue(attemptNumber));
         request.addMessageAttributesEntry("email", new MessageAttributeValue().withDataType("String").withStringValue(email));
         request.addMessageAttributesEntry("assignmentId", new MessageAttributeValue().withDataType("String").withStringValue(submission.assignmentId));
-        request.addMessageAttributesEntry("assignmentTitle", new MessageAttributeValue().withDataType("String").withStringValue(submission.assignmentId));
+        request.addMessageAttributesEntry("assignmentTitle", new MessageAttributeValue().withDataType("String").withStringValue(assignmentTitle));
+        request.addMessageAttributesEntry("firstname", new MessageAttributeValue().withDataType("String").withStringValue(firstname));
         PublishResult result = snsClient.publish(request);
         System.out.println(result.getMessageId() + " Message sent. Status is " + result.getSdkHttpMetadata());
     }
