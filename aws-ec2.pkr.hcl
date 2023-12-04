@@ -85,4 +85,8 @@ build {
     ]
     inline = ["sudo bash ~/setup-cloudapp-instance.sh"]
   }
+
+  post-processor "manifest" {
+    output = "manifest.json"
+  }
 }
