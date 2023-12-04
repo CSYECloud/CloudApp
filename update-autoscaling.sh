@@ -1,4 +1,4 @@
-!/bin/bash
+!/bin/sh
 set -e 
 set -o pipefail
 
@@ -6,7 +6,7 @@ aws ec2 create-launch-template-version \
     --launch-template-name "cloudapp-ec2-launchtemplate" \
     --version-description launch-template-versioning \
     --source-version '$Latest' \
-    --launch-template-data "ImageId=ami-065d5effd9a8353f2"
+    --launch-template-data "ImageId=$AMI_ID"
 
 aws autoscaling update-auto-scaling-group --auto-scaling-group-name csye6225_asg \
   --launch-template LaunchTemplateName=cloudapp-ec2-launchtemplate,Version='$Latest'
