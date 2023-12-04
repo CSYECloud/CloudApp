@@ -2,7 +2,7 @@ name: CloudApp Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "ami_auto_scale_update" ]
 
 jobs:
   deploy:
@@ -67,3 +67,15 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
           AWS_DEFAULT_SUBNET: ${{ vars.AWS_DEFAULT_SUBNET }}
+
+      - name: Extract ami id
+        run: export AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2) && echo $AMI_ID
+      
+      - name: Run `update-autoscaling.sh`
+        id: build
+        run: sh update-autoscaling.sh
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+      
