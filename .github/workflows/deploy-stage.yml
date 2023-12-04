@@ -72,7 +72,7 @@ jobs:
         run: export AMI_ID=$(jq -r '.builds[-1].artifact_id' manifest.json | cut -d ":" -f2) && echo $AMI_ID
       
       - name: Run `update-autoscaling.sh`
-        id: build
+        id: update-autoscale
         run: sh update-autoscaling.sh
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
