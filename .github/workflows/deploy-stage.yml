@@ -2,7 +2,7 @@ name: CloudApp Deploy
 
 on:
   push:
-    branches: [ "main", "ami_auto_scale_update" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
