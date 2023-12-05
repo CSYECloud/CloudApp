@@ -59,7 +59,7 @@ public class AssignmentController {
     private AmazonSNS snsClient = AmazonSNSClientBuilder.defaultClient();
 
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
-    @GetMapping("/v2/assignments")
+    @GetMapping("/v1/assignments")
     public ResponseEntity getAssignments() {
         long startTime = System.currentTimeMillis();
         log.info("Get assignments API invoked");
