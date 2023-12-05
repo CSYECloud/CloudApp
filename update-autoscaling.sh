@@ -11,7 +11,7 @@ aws ec2 create-launch-template-version \
 aws autoscaling update-auto-scaling-group --auto-scaling-group-name csye6225_asg \
   --launch-template LaunchTemplateName=cloudapp-ec2-launchtemplate,Version='$Latest'
 
-aws autoscaling start-instance-refresh --auto-scaling-group-name csye6225_asg --preferences '{"InstanceWarmup": 60, "MinHealthyPercentage": 100}' > InstanceRefreshStatus.json
+aws autoscaling start-instance-refresh --auto-scaling-group-name csye6225_asg --preferences '{"InstanceWarmup": 60, "MinHealthyPercentage": 50}' > InstanceRefreshStatus.json
 
 InstanceRefreshId=$(jq -r .InstanceRefreshId InstanceRefreshStatus.json)
 echo "Instance refresh id: $InstanceRefreshId\n"

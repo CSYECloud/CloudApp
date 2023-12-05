@@ -44,14 +44,20 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid auth token");
             return;
         }
-        authHeader = authHeader.substring("Basic".length()).trim();
-        byte[] decodedBytes = Base64.getDecoder().decode(authHeader);
-        String decodedAuthHeader = new String(decodedBytes);
+        String decodedAuthHeader="";
+        try {
+            authHeader = authHeader.substring("Basic".length()).trim();
+            byte[] decodedBytes = Base64.getDecoder().decode(authHeader);
+            decodedAuthHeader = new String(decodedBytes, "UTF-8");
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
 
         String[] email_pass = decodedAuthHeader.split(":");
         if(email_pass.length < 2 || email_pass[0].isBlank() || email_pass[1].isBlank()) {
             filterChain.doFilter(request, response);
-            System.out.println("Filtering harry");
             return;
         }
         String email = email_pass[0];
