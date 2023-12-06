@@ -59,7 +59,7 @@ public class AssignmentController {
     private AmazonSNS snsClient = AmazonSNSClientBuilder.defaultClient();
 
     @Transactional(propagation= Propagation.REQUIRED, readOnly=true, noRollbackFor=Exception.class)
-    @GetMapping("/v1/assignments")
+    @GetMapping("/v2/assignments")
     public ResponseEntity getAssignments() {
         long startTime = System.currentTimeMillis();
         log.info("Get assignments API invoked");
@@ -91,7 +91,7 @@ public class AssignmentController {
         }
     }
 
-    @PostMapping("/v1/assignments")
+    @PostMapping("/v2/assignments")
     public ResponseEntity createAssignment(@RequestBody @Valid AssignmentDto assignmentDto) throws PSQLException {
         long startTime = System.currentTimeMillis();
         log.info("Post assignment with API invoked");
@@ -107,7 +107,7 @@ public class AssignmentController {
         }
     }
 
-    @PostMapping("/v1/assignments/{id}/submission")
+    @PostMapping("/v2/assignments/{id}/submission")
     public ResponseEntity submitAssignment(@PathVariable("id") String assignmentId, @RequestBody @Valid SubmissionDto submissionDto) throws PSQLException {
         long startTime = System.currentTimeMillis();
         statsd.incrementCounter("assignment-submission");
